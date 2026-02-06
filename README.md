@@ -1,4 +1,4 @@
-# 🚀 SmartOps AI - Target Application
+#  SmartOps AI - Target Application
 
 > **Production-Grade Microservices Demo Environment for Autonomous Incident Resolution**
 
@@ -11,7 +11,7 @@ A fully instrumented e-commerce microservices application designed as a **target
 
 ---
 
-## 🎯 Project Purpose
+##  Project Purpose
 
 This application serves as a **realistic target environment** for:
 
@@ -24,7 +24,7 @@ This application serves as a **realistic target environment** for:
 
 ---
 
-## 🏗️ Architecture
+##  Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -58,7 +58,7 @@ This application serves as a **realistic target environment** for:
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 smartops/
@@ -105,7 +105,7 @@ smartops/
 
 ---
 
-## 🔧 Tech Stack
+##  Tech Stack
 
 | Layer | Technology | Purpose |
 |-------|------------|---------|
@@ -120,7 +120,7 @@ smartops/
 
 ---
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### Prerequisites
 - Docker & Docker Compose
@@ -153,7 +153,7 @@ docker-compose up -d
 
 ---
 
-## 📊 Observability Features
+##  Observability Features
 
 ### Metrics (Prometheus)
 Each service exposes `/metrics` endpoint with:
@@ -186,7 +186,7 @@ Each service exposes `/metrics` endpoint with:
 
 ---
 
-## 🔥 Chaos Engineering
+##  Chaos Engineering
 
 ### Built-in Failure Injection Endpoints
 
@@ -214,7 +214,7 @@ Invoke-RestMethod -Uri "http://localhost:8001/simulate-redis-latency" `
 
 ---
 
-## 🗄️ Database Schema
+##  Database Schema
 
 ### PostgreSQL Tables
 
@@ -249,7 +249,7 @@ Invoke-RestMethod -Uri "http://localhost:8001/simulate-redis-latency" `
 
 ---
 
-## 🧪 Testing
+##  Testing
 
 ### Load Testing with Locust
 ```bash
@@ -276,7 +276,7 @@ Invoke-RestMethod -Uri "http://localhost:8001/orders/test"
 
 ---
 
-## 🔍 View Database Data
+##  View Database Data
 
 ```bash
 # View orders
@@ -291,7 +291,7 @@ docker exec aiops-redis redis-cli KEYS "cart:*"
 
 ---
 
-## 📈 Prometheus Queries
+##  Prometheus Queries
 
 ```promql
 # Total requests by service
@@ -309,7 +309,7 @@ error_rate
 
 ---
 
-## 🛠️ Development
+##  Development
 
 ### Add New Service
 1. Create `services/new-service/main.py`
@@ -328,20 +328,6 @@ error_rate
 
 ---
 
-## 📜 License
 
-MIT License - See [LICENSE](LICENSE) for details.
 
----
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing`)
-5. Open Pull Request
-
----
-
-**Built for SmartOps AI - Autonomous Incident Resolution Engine** 🤖
+**Built for SmartOps AI - Autonomous Incident Resolution Engine** 
