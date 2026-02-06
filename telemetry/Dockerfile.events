@@ -1,0 +1,14 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install dependencies
+RUN pip install --no-cache-dir httpx
+
+# Copy telemetry code
+COPY telemetry/event_simulator.py /app/event_simulator.py
+
+# Create data directory
+RUN mkdir -p /data
+
+CMD ["python", "event_simulator.py"]

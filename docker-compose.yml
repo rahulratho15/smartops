@@ -1,0 +1,260 @@
+# =============================================================================
+
+# =============================================================================
+# AIOps Telemetry Platform - Docker Compose Configuration
+# Phase 2: Real Persistence with PostgreSQL + Redis
+# =============================================================================
+
+services:
+  # ===========================================================================
+  # Data Layer - PostgreSQL & Redis
+  # ===========================================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: aiops-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=aiops
+      - POSTGRES_PASSWORD=aiops_secret
+      - POSTGRES_DB=aiops
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - aiops-network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U aiops -d aiops" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: aiops-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis-data:/data
+    networks:
+      - aiops-network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ===========================================================================
+  # Frontend
+  # ===========================================================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - cart-service
+      - payment-service
+      - inventory-service
+    networks:
+      - aiops-network
+    restart: unless-stopped
+
+  # ===========================================================================
+  # Backend Services
+  # ===========================================================================
+  cart-service:
+    build:
+      context: .
+      dockerfile: services/cart-service/Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      - SERVICE_NAME=cart-service
+      - SERVICE_VERSION=v2
+      - POD_ID=cart-pod-001
+      - PAYMENT_SERVICE_URL=http://payment-service:8002
+      - INVENTORY_SERVICE_URL=http://inventory-service:8003
+      - JAEGER_HOST=jaeger
+      - JAEGER_PORT=6831
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=aiops
+      - POSTGRES_PASSWORD=aiops_secret
+      - POSTGRES_DB=aiops
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      jaeger:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - aiops-network
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  payment-service:
+    build:
+      context: .
+      dockerfile: services/payment-service/Dockerfile
+    ports:
+      - "8002:8002"
+    environment:
+      - SERVICE_NAME=payment-service
+      - SERVICE_VERSION=v2
+      - POD_ID=payment-pod-001
+      - INVENTORY_SERVICE_URL=http://inventory-service:8003
+      - JAEGER_HOST=jaeger
+      - JAEGER_PORT=6831
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=aiops
+      - POSTGRES_PASSWORD=aiops_secret
+      - POSTGRES_DB=aiops
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      jaeger:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - aiops-network
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  inventory-service:
+    build:
+      context: .
+      dockerfile: services/inventory-service/Dockerfile
+    ports:
+      - "8003:8003"
+    environment:
+      - SERVICE_NAME=inventory-service
+      - SERVICE_VERSION=v2
+      - POD_ID=inventory-pod-001
+      - JAEGER_HOST=jaeger
+      - JAEGER_PORT=6831
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=aiops
+      - POSTGRES_PASSWORD=aiops_secret
+      - POSTGRES_DB=aiops
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      jaeger:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - aiops-network
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ===========================================================================
+  # Observability Stack
+  # ===========================================================================
+  prometheus:
+    image: prom/prometheus:v2.48.0
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.enable-lifecycle'
+      - '--storage.tsdb.retention.time=7d'
+    networks:
+      - aiops-network
+    restart: unless-stopped
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.52
+    ports:
+      - "16686:16686" # UI
+      - "6831:6831/udp" # Thrift compact
+      - "6832:6832/udp" # Thrift binary
+      - "14268:14268" # HTTP collector
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    networks:
+      - aiops-network
+    restart: unless-stopped
+
+  # ===========================================================================
+  # Telemetry Simulators
+  # ===========================================================================
+  event-simulator:
+    build:
+      context: .
+      dockerfile: telemetry/Dockerfile.events
+    environment:
+      - EVENT_LOG_FILE=/data/k8s_events.json
+      - SIMULATION_INTERVAL=30
+    volumes:
+      - telemetry-data:/data
+    networks:
+      - aiops-network
+    restart: unless-stopped
+
+  incident-tracker:
+    build:
+      context: .
+      dockerfile: telemetry/Dockerfile.incidents
+    environment:
+      - INCIDENT_LOG_FILE=/data/incidents.json
+      - DEPLOYMENT_LOG_FILE=/data/deployments.json
+      - CHECK_INTERVAL=15
+      - CART_SERVICE_URL=http://cart-service:8001
+      - PAYMENT_SERVICE_URL=http://payment-service:8002
+      - INVENTORY_SERVICE_URL=http://inventory-service:8003
+    volumes:
+      - telemetry-data:/data
+    depends_on:
+      - cart-service
+      - payment-service
+      - inventory-service
+    networks:
+      - aiops-network
+    restart: unless-stopped
+
+# =============================================================================
+# Networks
+# =============================================================================
+networks:
+  aiops-network:
+    driver: bridge
+
+# =============================================================================
+# Volumes
+# =============================================================================
+volumes:
+  prometheus-data:
+  telemetry-data:
+  postgres-data:
+  redis-data:

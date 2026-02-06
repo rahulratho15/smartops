@@ -1,0 +1,74 @@
+# Render Blueprint - Deploy all services
+# https://render.com/docs/blueprint-spec
+
+services:
+  # Frontend
+  - type: web
+    name: aiops-frontend
+    runtime: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    envVars:
+      - key: PORT
+        value: 3000
+    healthCheckPath: /
+    
+  # Cart Service
+  - type: web
+    name: aiops-cart-service
+    runtime: docker
+    dockerfilePath: ./services/cart-service/Dockerfile
+    dockerContext: .
+    envVars:
+      - key: SERVICE_NAME
+        value: cart-service
+      - key: SERVICE_VERSION
+        value: v1
+      - key: POD_ID
+        value: cart-pod-render
+      - key: PAYMENT_SERVICE_URL
+        fromService:
+          type: web
+          name: aiops-payment-service
+          property: host
+      - key: INVENTORY_SERVICE_URL
+        fromService:
+          type: web
+          name: aiops-inventory-service
+          property: host
+    healthCheckPath: /health
+
+  # Payment Service  
+  - type: web
+    name: aiops-payment-service
+    runtime: docker
+    dockerfilePath: ./services/payment-service/Dockerfile
+    dockerContext: .
+    envVars:
+      - key: SERVICE_NAME
+        value: payment-service
+      - key: SERVICE_VERSION
+        value: v1
+      - key: POD_ID
+        value: payment-pod-render
+      - key: INVENTORY_SERVICE_URL
+        fromService:
+          type: web
+          name: aiops-inventory-service
+          property: host
+    healthCheckPath: /health
+
+  # Inventory Service
+  - type: web
+    name: aiops-inventory-service
+    runtime: docker
+    dockerfilePath: ./services/inventory-service/Dockerfile
+    dockerContext: .
+    envVars:
+      - key: SERVICE_NAME
+        value: inventory-service
+      - key: SERVICE_VERSION
+        value: v1
+      - key: POD_ID
+        value: inventory-pod-render
+    healthCheckPath: /health

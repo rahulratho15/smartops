@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: event-simulator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: event-simulator
+  template:
+    metadata:
+      labels:
+        app: event-simulator
+    spec:
+      containers:
+      - name: event-simulator
+        image: aiops/event-simulator:latest
+        imagePullPolicy: Never
+        env:
+        - name: EVENT_LOG_FILE
+          value: "/data/k8s_events.json"
+        volumeMounts:
+        - name: telemetry-data
+          mountPath: /data
+      volumes:
+      - name: telemetry-data
+        emptyDir: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: incident-tracker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: incident-tracker
+  template:
+    metadata:
+      labels:
+        app: incident-tracker
+    spec:
+      containers:
+      - name: incident-tracker
+        image: aiops/incident-tracker:latest
+        imagePullPolicy: Never
+        env:
+        - name: INCIDENT_LOG_FILE
+          value: "/data/incidents.json"
+        - name: CART_SERVICE_URL
+          value: "http://cart-service:8001"
+        volumeMounts:
+        - name: telemetry-data
+          mountPath: /data
+      volumes:
+      - name: telemetry-data
+        emptyDir: {}

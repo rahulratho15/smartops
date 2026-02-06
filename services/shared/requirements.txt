@@ -1,0 +1,52 @@
+# =============================================================================
+# Shared Dependencies for AIOps Telemetry Platform
+# Phase 2: Real Persistence with PostgreSQL + Redis
+# =============================================================================
+
+# Web Framework
+fastapi==0.109.0
+uvicorn==0.27.0
+
+# HTTP Client
+httpx==0.26.0
+
+# System Metrics
+psutil==5.9.8
+
+# =============================================================================
+# Observability Stack
+# =============================================================================
+
+# Prometheus Metrics
+prometheus-client==0.19.0
+
+# OpenTelemetry Core
+opentelemetry-api==1.22.0
+opentelemetry-sdk==1.22.0
+
+# OpenTelemetry Exporters
+opentelemetry-exporter-jaeger==1.21.0
+
+# OpenTelemetry Instrumentation - Web
+opentelemetry-instrumentation-fastapi==0.43b0
+opentelemetry-instrumentation-httpx==0.43b0
+
+# OpenTelemetry Instrumentation - Database (NEW)
+opentelemetry-instrumentation-asyncpg==0.43b0
+opentelemetry-instrumentation-redis==0.43b0
+
+# Structured Logging
+python-json-logger==2.0.7
+
+# =============================================================================
+# Database Layer (NEW - Phase 2)
+# =============================================================================
+
+# PostgreSQL Async Driver
+asyncpg==0.29.0
+
+# SQLAlchemy with Async Support
+sqlalchemy[asyncio]==2.0.25
+
+# Redis Async Client
+redis==5.0.1

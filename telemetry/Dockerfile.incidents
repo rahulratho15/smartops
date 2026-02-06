@@ -1,0 +1,15 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install dependencies
+RUN pip install --no-cache-dir httpx
+
+# Copy telemetry code
+COPY telemetry/incident_tracker.py /app/incident_tracker.py
+COPY telemetry/deployment_tracker.py /app/deployment_tracker.py
+
+# Create data directory
+RUN mkdir -p /data
+
+CMD ["python", "incident_tracker.py"]

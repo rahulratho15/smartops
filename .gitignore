@@ -1,0 +1,46 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+telemetry/*.json
+
+# Data files
+*.csv
+data/
+
+# Docker volumes (local)
+postgres-data/
+redis-data/
+prometheus-data/
+telemetry-data/
+
+# Test artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Secrets (never commit)
+.env.local
+*.pem
+*.key
+secrets/

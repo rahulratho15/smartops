@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechStore Pro | AIOps Telemetry Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo">
+                <span class="logo-icon">⚡</span>
+                <span class="logo-text">TechStore <span class="logo-pro">Pro</span></span>
+            </div>
+
+            <nav class="main-nav">
+                <button class="nav-btn active" data-view="shop">
+                    <span class="nav-icon">🛍️</span>
+                    <span>Shop</span>
+                </button>
+                <button class="nav-btn" data-view="cart">
+                    <span class="nav-icon">🛒</span>
+                    <span>Cart</span>
+                    <span class="cart-badge" id="cartCount">0</span>
+                </button>
+                <button class="nav-btn" data-view="orders">
+                    <span class="nav-icon">📦</span>
+                    <span>Orders</span>
+                </button>
+                <button class="nav-btn" data-view="data">
+                    <span class="nav-icon">📊</span>
+                    <span>Data</span>
+                </button>
+                <button class="nav-btn admin-btn" data-view="admin">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Admin</span>
+                </button>
+            </nav>
+
+            <div class="header-right">
+                <div class="search-box">
+                    <input type="text" placeholder="Search products..." id="searchInput">
+                    <button class="search-btn">🔍</button>
+                </div>
+                <div class="user-menu">
+                    <div class="user-avatar">👤</div>
+                    <span class="user-name" id="userName">Guest</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Banner -->
+    <section class="hero-banner" id="heroBanner">
+        <div class="hero-content">
+            <div class="hero-badge">🔥 New Arrivals</div>
+            <h1>Premium Tech <span class="highlight">at Your Fingertips</span></h1>
+            <p>Discover the latest electronics with lightning-fast delivery</p>
+            <button class="hero-cta" onclick="switchView('shop')">Shop Now →</button>
+        </div>
+        <div class="hero-image">
+            <div class="floating-card">💻</div>
+            <div class="floating-card delay-1">📱</div>
+            <div class="floating-card delay-2">🎧</div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Shop View -->
+        <section class="view active" id="shopView">
+            <div class="section-header">
+                <h2>Featured Products</h2>
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-filter="all">All</button>
+                    <button class="filter-tab" data-filter="electronics">Electronics</button>
+                    <button class="filter-tab" data-filter="accessories">Accessories</button>
+                    <button class="filter-tab" data-filter="wearables">Wearables</button>
+                </div>
+            </div>
+
+            <div class="products-grid" id="productsGrid">
+                <div class="loading-skeleton">
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cart View -->
+        <section class="view" id="cartView">
+            <div class="cart-container">
+                <div class="cart-items-section">
+                    <h2>Shopping Cart</h2>
+                    <div class="cart-items" id="cartItems">
+                        <div class="empty-cart">
+                            <span class="empty-icon">🛒</span>
+                            <p>Your cart is empty</p>
+                            <button class="btn-primary" onclick="switchView('shop')">Start Shopping</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cart-summary">
+                    <h3>Order Summary</h3>
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span id="subtotal">$0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Shipping</span>
+                        <span class="free-shipping">FREE</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Tax (8%)</span>
+                        <span id="tax">$0.00</span>
+                    </div>
+                    <div class="summary-divider"></div>
+                    <div class="summary-row total">
+                        <span>Total</span>
+                        <span id="total">$0.00</span>
+                    </div>
+                    <button class="checkout-btn" id="checkoutBtn" disabled>
+                        <span>Proceed to Checkout</span>
+                        <span class="btn-arrow">→</span>
+                    </button>
+                    <div class="payment-methods">
+                        <span>We accept:</span>
+                        <div class="payment-icons">
+                            <span>💳</span>
+                            <span>🏦</span>
+                            <span>📱</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Orders View -->
+        <section class="view" id="ordersView">
+            <h2>Your Orders</h2>
+            <div class="orders-list" id="ordersList">
+                <div class="no-orders">
+                    <span class="empty-icon">📦</span>
+                    <p>No orders yet</p>
+                    <p class="subtitle">Your completed orders will appear here</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Data Collection View -->
+        <section class="view" id="dataView">
+            <div class="admin-header">
+                <h2>📊 Telemetry Data Collection</h2>
+                <p class="admin-subtitle">Real-time data from services, Prometheus, and Jaeger</p>
+            </div>
+
+            <!-- Collection Stats -->
+            <div class="admin-section">
+                <div class="section-title">
+                    <h3>📈 Collection Statistics</h3>
+                    <button class="refresh-btn" id="collectDataBtn">
+                        <span>📥</span> Collect Now
+                    </button>
+                </div>
+
+                <div class="health-grid">
+                    <div class="health-card" style="border-left: 3px solid var(--primary);">
+                        <div class="health-icon">📊</div>
+                        <div class="health-info">
+                            <h4>Metrics</h4>
+                            <p class="health-url">CPU, Memory, Latency</p>
+                        </div>
+                        <div class="health-status" id="metricsCount">0 rows</div>
+                    </div>
+
+                    <div class="health-card" style="border-left: 3px solid var(--success);">
+                        <div class="health-icon">📝</div>
+                        <div class="health-info">
+                            <h4>Logs</h4>
+                            <p class="health-url">Container logs</p>
+                        </div>
+                        <div class="health-status" id="logsCount">0 rows</div>
+                    </div>
+
+                    <div class="health-card" style="border-left: 3px solid var(--warning);">
+                        <div class="health-icon">🔗</div>
+                        <div class="health-info">
+                            <h4>Traces</h4>
+                            <p class="health-url">Distributed traces</p>
+                        </div>
+                        <div class="health-status" id="tracesCount">0 rows</div>
+                    </div>
+
+                    <div class="health-card" style="border-left: 3px solid var(--danger);">
+                        <div class="health-icon">🚨</div>
+                        <div class="health-info">
+                            <h4>Incidents</h4>
+                            <p class="health-url">Detected errors</p>
+                        </div>
+                        <div class="health-status" id="incidentsCount">0 rows</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Metrics -->
+            <div class="admin-section">
+                <div class="section-title">
+                    <h3>⚡ Live Metrics</h3>
+                    <button class="refresh-btn" id="refreshMetricsBtn">
+                        <span>↻</span> Refresh
+                    </button>
+                </div>
+
+                <div class="data-table-container">
+                    <table class="data-table" id="metricsTable">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Service</th>
+                                <th>CPU %</th>
+                                <th>Memory MB</th>
+                                <th>Latency ms</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="metricsTableBody">
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: var(--text-muted);">Click "Collect
+                                    Now" to gather data</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Recent Logs -->
+            <div class="admin-section">
+                <div class="section-title">
+                    <h3>📋 Recent Logs</h3>
+                    <select id="logServiceFilter"
+                        style="padding: 0.5rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 0.5rem; color: var(--text-primary);">
+                        <option value="all">All Services</option>
+                        <option value="cart-service">Cart Service</option>
+                        <option value="payment-service">Payment Service</option>
+                        <option value="inventory-service">Inventory Service</option>
+                    </select>
+                </div>
+
+                <div class="logs-container" id="logsContainer">
+                    <div class="log-entry" style="color: var(--text-muted);">Click "Collect Now" to gather logs</div>
+                </div>
+            </div>
+
+            <!-- Download Section -->
+            <div class="admin-section">
+                <div class="section-title">
+                    <h3>📥 Export Data</h3>
+                </div>
+
+                <div class="quick-actions">
+                    <button class="action-btn cascade" id="downloadMetricsBtn">
+                        <span class="action-icon">📊</span>
+                        <span class="action-text">
+                            <strong>Download Metrics</strong>
+                            <small>Export as CSV</small>
+                        </span>
+                    </button>
+
+                    <button class="action-btn load" id="downloadLogsBtn">
+                        <span class="action-icon">📝</span>
+                        <span class="action-text">
+                            <strong>Download Logs</strong>
+                            <small>Export as CSV</small>
+                        </span>
+                    </button>
+
+                    <button class="action-btn traffic" id="downloadTracesBtn">
+                        <span class="action-icon">🔗</span>
+                        <span class="action-text">
+                            <strong>Download Traces</strong>
+                            <small>Export as CSV</small>
+                        </span>
+                    </button>
+
+                    <button class="action-btn extract" id="downloadAllBtn">
+                        <span class="action-icon">💾</span>
+                        <span class="action-text">
+                            <strong>Download All</strong>
+                            <small>Export complete dataset</small>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Admin View -->
+        <section class="view" id="adminView">
+            <div class="admin-header">
+                <h2>🔧 System Administration</h2>
+                <p class="admin-subtitle">AIOps Telemetry Dashboard & Chaos Engineering</p>
+            </div>
+
+            <!-- Service Health Dashboard -->
+            <div class="admin-section">
+                <div class="section-title">
+                    <h3>📊 Service Health Monitor</h3>
+                    <button class="refresh-btn" id="refreshHealthBtn">
+                        <span>↻</span> Refresh
+                    </button>
+                </div>
+
+                <div class="health-grid">
+                    <div class="health-card" data-service="cart">
+                        <div class="health-icon">🛒</div>
+                        <div class="health-info">
+                            <h4>Cart Service</h4>
+                            <p class="health-url">localhost:8001</p>
+                        </div>
+                        <div class="health-status checking">Checking...</div>
+                        <div class="health-metrics">
+                            <span class="metric">
+                                <span class="metric-label">Latency</span>
+                                <span class="metric-value" id="cartLatency">--</span>
+                            </span>
+                            <span class="metric">
+                                <span class="metric-label">Uptime</span>
+                                <span class="metric-value" id="cartUptime">--</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="health-card" data-service="payment">
+                        <div class="health-icon">💳</div>
+                        <div class="health-info">
+                            <h4>Payment Service</h4>
+                            <p class="health-url">localhost:8002</p>
+                        </div>
+                        <div class="health-status checking">Checking...</div>
+                        <div class="health-metrics">
+                            <span class="metric">
+                                <span class="metric-label">Latency</span>
+                                <span class="metric-value" id="paymentLatency">--</span>
+                            </span>
+                            <span class="metric">
+                                <span class="metric-label">Uptime</span>
+                                <span class="metric-value" id="paymentUptime">--</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="health-card" data-service="inventory">
+                        <div class="health-icon">📦</div>
+                        <div class="health-info">
+                            <h4>Inventory Service</h4>
+                            <p class="health-url">localhost:8003</p>
+                        </div>
+                        <div class="health-status checking">Checking...</div>
+                        <div class="health-metrics">
+                            <span class="metric">
+                                <span class="metric-label">Latency</span>
+                                <span class="metric-value" id="inventoryLatency">--</span>
+                            </span>
+                            <span class="metric">
+                                <span class="metric-label">Uptime</span>
+                                <span class="metric-value" id="inventoryUptime">--</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chaos Engineering -->
+            <div class="admin-section">
+                <div class="section-title">
+                    <h3>💥 Chaos Engineering</h3>
+                    <span class="warning-badge">⚠️ Use with caution</span>
+                </div>
+
+                <div class="chaos-grid">
+                    <!-- CPU Stress -->
+                    <div class="chaos-card">
+                        <div class="chaos-header">
+                            <span class="chaos-icon">🔥</span>
+                            <h4>CPU Stress Test</h4>
+                        </div>
+                        <p class="chaos-desc">Spike CPU usage to test auto-scaling and alerting</p>
+                        <div class="chaos-controls">
+                            <div class="control-group">
+                                <label>Target Service</label>
+                                <select id="cpuService">
+                                    <option value="cart">Cart Service</option>
+                                    <option value="payment">Payment Service</option>
+                                    <option value="inventory">Inventory Service</option>
+                                </select>
+                            </div>
+                            <div class="control-row">
+                                <div class="control-group">
+                                    <label>Duration (s)</label>
+                                    <input type="number" id="cpuDuration" value="5" min="1" max="30">
+                                </div>
+                                <div class="control-group">
+                                    <label>Intensity</label>
+                                    <input type="range" id="cpuIntensity" min="0.1" max="1" step="0.1" value="0.8">
+                                </div>
+                            </div>
+                            <button class="chaos-btn danger" id="stressCpuBtn">
+                                🔥 Trigger CPU Stress
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Latency Injection -->
+                    <div class="chaos-card">
+                        <div class="chaos-header">
+                            <span class="chaos-icon">🐢</span>
+                            <h4>Latency Injection</h4>
+                        </div>
+                        <p class="chaos-desc">Add artificial delay to test timeout handling</p>
+                        <div class="chaos-controls">
+                            <div class="control-group">
+                                <label>Target Service</label>
+                                <select id="slowService">
+                                    <option value="cart">Cart Service</option>
+                                    <option value="payment">Payment Service</option>
+                                    <option value="inventory">Inventory Service</option>
+                                </select>
+                            </div>
+                            <div class="control-group">
+                                <label>Delay (seconds)</label>
+                                <input type="number" id="slowDelay" value="3" min="1" max="30" step="0.5">
+                            </div>
+                            <button class="chaos-btn warning" id="slowResponseBtn">
+                                🐢 Inject Latency
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Error Injection -->
+                    <div class="chaos-card">
+                        <div class="chaos-header">
+                            <span class="chaos-icon">💔</span>
+                            <h4>Error Injection</h4>
+                        </div>
+                        <p class="chaos-desc">Trigger specific error types for incident testing</p>
+                        <div class="chaos-controls">
+                            <div class="control-group">
+                                <label>Target Service</label>
+                                <select id="errorService">
+                                    <option value="cart">Cart Service</option>
+                                    <option value="payment">Payment Service</option>
+                                    <option value="inventory">Inventory Service</option>
+                                </select>
+                            </div>
+                            <div class="control-group">
+                                <label>Error Type</label>
+                                <select id="errorType">
+                                    <option value="thread_pool">Thread Pool Exhausted</option>
+                                    <option value="cpu_throttle">CPU Throttling</option>
+                                    <option value="memory">Out of Memory</option>
+                                    <option value="timeout">Connection Timeout</option>
+                                    <option value="generic">Generic Exception</option>
+                                </select>
+                            </div>
+                            <button class="chaos-btn danger" id="triggerErrorBtn">
+                                💔 Trigger Error
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Memory Leak -->
+                    <div class="chaos-card">
+                        <div class="chaos-header">
+                            <span class="chaos-icon">🧠</span>
+                            <h4>Memory Leak Simulation</h4>
+                        </div>
+                        <p class="chaos-desc">Gradually consume memory to test OOM detection</p>
+                        <div class="chaos-controls">
+                            <div class="control-group">
+                                <label>Target Service</label>
+                                <select id="memoryService">
+                                    <option value="cart">Cart Service</option>
+                                    <option value="payment">Payment Service</option>
+                                    <option value="inventory">Inventory Service</option>
+                                </select>
+                            </div>
+                            <div class="control-group">
+                                <label>Memory Size (MB)</label>
+                                <input type="number" id="memorySize" value="10" min="1" max="100">
+                            </div>
+                            <button class="chaos-btn warning" id="memoryLeakBtn">
+                                🧠 Simulate Memory Leak
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="admin-section">
+                <div class="section-title">
+                    <h3>⚡ Quick Actions</h3>
+                </div>
+
+                <div class="quick-actions">
+                    <button class="action-btn cascade" id="cascadeFailureBtn">
+                        <span class="action-icon">🌊</span>
+                        <span class="action-text">
+                            <strong>Cascade Failure</strong>
+                            <small>Trigger errors across all services</small>
+                        </span>
+                    </button>
+
+                    <button class="action-btn load" id="highLoadBtn">
+                        <span class="action-icon">📈</span>
+                        <span class="action-text">
+                            <strong>High Load Test</strong>
+                            <small>Simulate traffic spike</small>
+                        </span>
+                    </button>
+
+                    <button class="action-btn traffic" id="normalTrafficBtn">
+                        <span class="action-icon">🚶</span>
+                        <span class="action-text">
+                            <strong>Normal Traffic</strong>
+                            <small>Generate baseline traffic</small>
+                        </span>
+                    </button>
+
+                    <button class="action-btn extract" id="extractDataBtn">
+                        <span class="action-icon">📊</span>
+                        <span class="action-text">
+                            <strong>Extract Data</strong>
+                            <small>Generate CSV datasets</small>
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Telemetry Info -->
+            <div class="admin-section telemetry-info">
+                <div class="section-title">
+                    <h3>📡 Telemetry Endpoints</h3>
+                </div>
+
+                <div class="endpoint-grid">
+                    <a href="http://localhost:9090" target="_blank" class="endpoint-card">
+                        <span class="endpoint-icon">📊</span>
+                        <div>
+                            <strong>Prometheus</strong>
+                            <small>localhost:9090</small>
+                        </div>
+                    </a>
+                    <a href="http://localhost:16686" target="_blank" class="endpoint-card">
+                        <span class="endpoint-icon">🔗</span>
+                        <div>
+                            <strong>Jaeger</strong>
+                            <small>localhost:16686</small>
+                        </div>
+                    </a>
+                    <a href="http://localhost:8001/metrics" target="_blank" class="endpoint-card">
+                        <span class="endpoint-icon">📈</span>
+                        <div>
+                            <strong>Cart Metrics</strong>
+                            <small>localhost:8001/metrics</small>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <span class="logo-icon">⚡</span>
+                <span>TechStore Pro</span>
+            </div>
+            <div class="footer-info">
+                <span>AIOps Telemetry Platform</span>
+                <span class="divider">•</span>
+                <span id="versionBadge">v1.0.0</span>
+            </div>
+            <div class="footer-links">
+                <a href="http://localhost:9090" target="_blank">Prometheus</a>
+                <a href="http://localhost:16686" target="_blank">Jaeger</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
